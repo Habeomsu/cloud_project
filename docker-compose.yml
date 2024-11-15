@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: music
+      MYSQL_USER: music
+      MYSQL_PASSWORD: 1234
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./db/store:/var/lib/mysql
+    networks:
+      - network
+
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+    networks:
+      - network
+    restart: always
+
+  auth-server:
+    build:
+      context: ./authServer
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/music?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: music
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - network
+
+  music-server:
+    build:
+      context: ./musicServer
+      dockerfile: Dockerfile
+    ports:
+      - '8081:8081'
+    restart: always
+    environment:
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SPOTIFY_CLIENT_ID: 345d71b717834eb7a4c0136d98112fe0
+      SPOTIFY_CLIENT_SECRET: 9b65b554fe7f4d47a6cddff37b9662f3
+    depends_on:
+      - redis
+      - auth-server
+    networks:
+      - network
+
+  react:
+    build:
+      context: ./front
+    ports:
+      - '3000:3000' # React 앱은 3000번 포트에서 실행
+    restart: always
+    networks:
+      - network
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf # 커스텀 nginx.conf 설정
+    depends_on:
+      - music-server
+      - auth-server
+      - react
+    ports:
+      - '80:80' # 80 포트로 요청을 처리
+    networks:
+      - network
+
+networks:
+  network:

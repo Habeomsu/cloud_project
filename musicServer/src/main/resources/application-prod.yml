@@ -1,0 +1,23 @@
+spring:
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT}
+      password: ''
+      database: 0
+    session:
+      store-type: redis
+      timeout: 1800s
+
+server:
+  port: 8081
+  servlet:
+    encoding:
+      charset: utf-8
+      enabled: true
+  session:
+    timeout: 1800s
+
+spotify:
+  clientId: ${SPOTIFY_CLIENT_ID}
+  clientSecret: ${SPOTIFY_CLIENT_SECRET}
