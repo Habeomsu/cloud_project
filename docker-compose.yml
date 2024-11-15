@@ -53,8 +53,8 @@ services:
     environment:
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
-      SPOTIFY_CLIENT_ID: 345d71b717834eb7a4c0136d98112fe0
-      SPOTIFY_CLIENT_SECRET: 9b65b554fe7f4d47a6cddff37b9662f3
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
     depends_on:
       - redis
       - auth-server
