@@ -1,0 +1,3 @@
+- 학교 3-2 기말 프로젝트 과제
+- react + 자바 서버( auth ) + 자바 서버( music ) + mysql + redis + nginx
+- 자바 서버끼리 세션 공유 형성 !!
